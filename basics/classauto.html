@@ -1,0 +1,35 @@
+<html>
+<head>
+</head>
+<body>
+	<script>
+	  class Auto {
+
+	   constructor(zn,km) {
+	    this.znacka=zn;
+		this.km=km;
+	   }
+	   get znackaAuta() {
+	     return this.znacka;
+	   }
+	   get kilometry() {
+	    return this.km;
+	   }
+	   set kilometry(km) {
+	    this.km=km;
+	   }
+	  }
+	  
+	  skoda=new Auto('skoda','100');
+	  document.write("vypis vlastnosti: ");
+	  for (let vlastnost in skoda) {
+	   document.write(vlastnost + "," + skoda[vlastnost]); 
+	  }
+	  document.write("<br />next: ");
+	  skoda.znackaAuta="bmw";
+	  document.write(skoda.znacka);
+	  skoda.kilometry=200;
+	  document.write(skoda.kilometry);
+	</script>
+</body>
+</html>

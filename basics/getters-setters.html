@@ -1,0 +1,26 @@
+<html>
+<head>
+</head>
+<body>
+	<script>
+	 class Clovek {
+	  constructor(jmeno,prijmeni) {
+	   this.jmeno=jmeno;
+	   this.prijmeni=prijmeni;
+	  }
+	  get celeJmeno() {
+	    return `jmeno:${this.jmeno} prijmeni:${this.prijmeni}`;
+	  }
+	  set celeJmeno(text) {
+	   const cast=text.split(',');
+	   this.jmeno=cast[0];
+	   this.prijmeni=cast[1];
+	  }
+	 }
+	 const c=new Clovek("mik","fik"); 
+	 alert(c.celeJmeno);
+	 c.celeJmeno = "majk,spirit";
+	 alert(c.celeJmeno);
+	</script>
+</body>
+</html>

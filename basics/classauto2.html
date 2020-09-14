@@ -1,0 +1,40 @@
+<html>
+<head>
+</head>
+<body>
+	<script>
+	 'use strict';
+	 
+	  class Auto {
+	   text='texticek';
+	   constructor(zn,km) {
+			this.km=km;
+			Object.defineProperty(this,'znacka', {
+				value:zn,
+				enumerable:true,
+				writable:false
+			});
+		}
+		toString() {
+		   let outStr="vypis vlastnosti: ";
+		  for (let vlastnost in skoda) {
+		   outStr+=vlastnost + "," + skoda[vlastnost]; 
+		   outStr+="<br />";
+		  } 		  
+		  outStr+='<br />';
+		  return outStr;
+		}		
+	  }	  
+	  const skoda=new Auto('skodovka','100');
+	  document.write(skoda);
+	  try {
+	   skoda.znacka="skoda2";
+	  }
+	  catch {
+	   document.write('<h3>nejde zmenit znacka, je writeable=false</h3>');
+	  }
+	  skoda.km=200;
+	  document.write(skoda);
+	</script>
+</body>
+</html>

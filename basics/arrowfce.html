@@ -1,0 +1,42 @@
+<html>
+<head>
+</head>
+<body>
+	<script>
+	 'use strict';
+	
+	const vypisOddel = function(text) {
+	 document.write("<br />" + text);
+	}
+	
+	// Klasická funkce
+	const mojeFunkce = function() {
+		vypisOddel("Zavolána klasická funkce");
+	}
+	mojeFunkce();
+	
+	//arrow fce / lambda fce
+	let fce = (slovo) => vypisOddel("zavolana arrow fce 1 " + slovo);
+	fce("ahoj");
+	
+	let fce2 = slovo => vypisOddel("zavolana arrow fce 2" + slovo);
+	fce2("ahoj2"); 
+	
+	let fce3 = ()  => vypisOddel("zavolana arrow fce 3");
+	fce3("ahoj3"); 
+	
+	let fce4 = (slovo) => {
+	 vypisOddel("zavolana arrow fce 4 " + slovo) 
+	};
+	fce4("ahoj4");
+		
+	
+	//arrow fce s implicitni navratovou hodnotou
+	const secti = (cislo1, cislo2) => cislo1 + cislo2;
+	vypisOddel(secti(5, 2));
+	
+	
+	
+	</script>
+</body>
+</html>

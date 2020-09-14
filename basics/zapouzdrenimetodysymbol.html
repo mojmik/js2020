@@ -1,0 +1,36 @@
+<html>
+<head>
+</head>
+<body>
+	<script>
+	 'use strict';
+	 
+		const _vybarvi = Symbol();
+		class Kruh {
+			[_vybarvi]() {
+				document.write('Barvím...<br />')
+			}
+			["barvi"]() {
+				document.write('Barvi...<br />')
+			}
+			vybarviTest() {
+			 this[_vybarvi]();
+			}
+			
+		}
+
+		const kruh = new Kruh();
+		kruh.vybarviTest();
+		kruh["barvi"]();
+		kruh[_vybarvi]();
+		
+		try {
+		 kruh._vybarvi();
+		}
+		catch (err) {
+		 document.write(err.message);
+		}
+		
+	</script>
+</body>
+</html>

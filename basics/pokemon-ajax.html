@@ -1,0 +1,89 @@
+<html>
+<head>
+</head>
+<body>
+<div class="poke-container">
+	<br />Seznam:<br />
+    <div id="poke-seznam"></div>
+	<br />Detaily:<br />
+    <div id="poke-detaily"></div>
+	<br />Misc:<br />
+	<div id="misc"></div>
+	<br />RAW json:<br />
+	<div id="rawjson"></div>
+</div>
+
+	<script>
+	function stahniJSON(url, callback)	{
+		let xhr = new XMLHttpRequest();
+		xhr.onload = () => {
+			let rawjsondiv = document.getElementById("rawjson");
+			let rawjsonresp = xhr.response;
+			rawjsondiv.innerText = rawjsonresp;
+			callback(JSON.parse(rawjsonresp));
+		}
+		xhr.open("GET", url);
+		xhr.send();
+	}	
+	function nactiSeznam(url)	{
+		let seznam_div = document.getElementById("poke-seznam");
+		seznam_div.innerHTML = "<ul id='poke-seznam-ul'></ul>";
+		let seznam_ul = document.getElementById("poke-seznam-ul");				
+
+		stahniJSON(url, (data) => {
+			let misc_div = document.getElementById("misc");
+			misc_div.innerHTML="";
+			let nextUrl=data.next;
+			let prevUrl=data.previous;
+			
+			let mFuncPrev=(prevUrl==null) ? () => undefined : () => {
+				misc_div.innerHTML += "<button id='prevPage'>predchozi stranka</button>";
+				misc_div.onclick = () => {
+					nactiSeznam(prevUrl);
+					let detaily_div = document.getElementById("poke-detaily");
+					detaily_div.innerHTML = "";
+				}
+			}
+			mFuncPrev();
+			
+			let mFuncNext=(nextUrl==null) ? () => undefined : () => {
+				misc_div.innerHTML += "<button id='nextPage'>dalsi stranka</button>";
+				misc_div.onclick = () => {
+					nactiSeznam(nextUrl);
+					let detaily_div = document.getElementById("poke-detaily");
+					detaily_div.innerHTML = "";
+				}
+			}
+			mFuncNext();
+						
+			
+			for (let pokemon of data.results)
+			{				
+				let novaPolozka = document.createElement("li");
+				novaPolozka.innerText = pokemon.name;
+				seznam_ul.appendChild(novaPolozka);
+				let poke_url = pokemon.url;
+				novaPolozka.addEventListener("click", () => nactiPokemona(poke_url));
+			}
+		});
+	}
+	function nactiPokemona(url)	{
+		let detaily_div = document.getElementById("poke-detaily");
+		stahniJSON(url, (data) => {
+			let html = `
+				<img src="${data.sprites.back_default}" />
+				<ul>
+					<li>Název: ${data.name}</li>
+					<li>Výška: ${data.height}</li>
+					<li>Váha: ${data.weight}</li>
+				</ul>
+			`;
+
+			detaily_div.innerHTML = html;
+		});
+	}
+	
+	nactiSeznam("https://pokeapi.co/api/v2/pokemon");
+	</script>
+</body>
+</html>

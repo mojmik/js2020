@@ -1,0 +1,33 @@
+<html>
+<head>
+</head>
+<body>
+	<script>
+	 'use strict';
+	 
+
+		const privates = new WeakMap();
+
+		class Kruh {
+
+			constructor(prumer) {
+				privates.set(this, {
+					_prumer: prumer,
+					_vykresli: function() {
+						document.write('vykresluji..');
+					}
+				});
+			}
+
+			vypisPrumer() {
+				document.write(privates.get(this)._prumer);
+			}
+		}
+
+		const kruh = new Kruh(10);
+		kruh.vypisPrumer(); // Vypíše 10		
+		document.write(privates.get(kruh)._prumer);
+		privates.get(kruh)._vykresli();	
+	</script>
+</body>
+</html>

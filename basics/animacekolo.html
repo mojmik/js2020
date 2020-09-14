@@ -1,0 +1,39 @@
+<html>
+<head>
+</head>
+<body>
+	<img src="kolo.png" id="kolo" />
+	<canvas id="platno" width="500" height="500"></canvas>
+	<script>
+		let platno;
+		let kontext;
+		let otoceni = 0;
+		let obrazek;
+
+		window.onload = function () {
+			platno = document.getElementById("platno");
+			kontext = platno.getContext("2d");
+			obrazek = document.getElementById("kolo");
+			obrazek.style.display = "none";
+		}
+		
+		function prekresli() {
+			kontext.clearRect(0,0,500,500);
+			kontext.save();
+			kontext.translate(290, 290);
+			kontext.rotate(otoceni);
+			kontext.drawImage(obrazek, -225, -225);
+			/*
+			kontext.beginPath();
+			kontext.lineTo(10,10);
+			kontext.endPath();
+			*/
+			kontext.restore();
+			otoceni += (2 * Math.PI) / 360; // otočení o 1 stupeň, ale v radiánech
+		}
+		
+		setInterval(prekresli, 20);
+		prekresli();
+	</script>
+</body>
+</html>

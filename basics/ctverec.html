@@ -1,0 +1,106 @@
+<html>
+<head>
+</head>
+<body>
+
+	<canvas id="platno" width="1000" height="1000"></canvas>
+	<script>
+		let platno;
+		let kontext;
+		let otoceni = 0;
+		let n=0;
+		let poleCar=[];
+		let pocetCar=0;
+		let cntr=0;
+		let barvicky=[];
+		function rainbow(numOfSteps, step) {
+			// This function generates vibrant, "evenly spaced" colours (i.e. no clustering). This is ideal for creating easily distinguishable vibrant markers in Google Maps and other apps.
+			// Adam Cole, 2011-Sept-14
+			// HSV to RBG adapted from: http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
+			var r, g, b;
+			var h = step / numOfSteps;
+			var i = ~~(h * 6);
+			var f = h * 6 - i;
+			var q = 1 - f;
+			switch(i % 6){
+				case 0: r = 1; g = f; b = 0; break;
+				case 1: r = q; g = 1; b = 0; break;
+				case 2: r = 0; g = 1; b = f; break;
+				case 3: r = 0; g = q; b = 1; break;
+				case 4: r = f; g = 0; b = 1; break;
+				case 5: r = 1; g = 0; b = q; break;
+			}
+			var c = "#" + ("00" + (~ ~(r * 255)).toString(16)).slice(-2) + ("00" + (~ ~(g * 255)).toString(16)).slice(-2) + ("00" + (~ ~(b * 255)).toString(16)).slice(-2);
+			return (c);
+		}
+
+		function getRandomColor() {
+		  var letters = '0123456789ABCDEF';
+		  var color = '#';
+		  for (var i = 0; i < 6; i++) {
+			color += letters[Math.floor(Math.random() * 16)];
+		  }
+		  return color;
+		}
+		let cary=function(x,y,width,height) {
+		  let x1=x;
+		  let y1=y;
+		  let x2=x+width;
+		  let y2=y+height;
+		  //let kresli=function() {
+		  function kresli() {
+		    kontext.beginPath();
+			kontext.moveTo(x, y);
+			kontext.lineTo(x2,y2);
+			kontext.strokeStyle = rainbow(2,50);
+			kontext.stroke();
+			kontext.closePath();
+		  }
+		  return kresli;
+		};
+
+		window.onload = function () {
+			platno = document.getElementById("platno");
+			kontext = platno.getContext("2d");
+
+			setInterval(prekresli, 0.01);
+			prekresli();
+		}
+		
+		function prekresli() {
+			//kontext.clearRect(0,0,500,500);
+			kontext.save();
+			n++;
+			kontext.translate(250, 250);
+			kontext.rotate(otoceni);				
+			//cary(10,10,100,200).kresli();	
+			if (pocetCar<5) {
+			 let cara1=cary(10+Math.random()*210,10+Math.random()*200,20+Math.random()*16,20+Math.random()*16);
+			 poleCar.push(cara1);
+			}
+			pocetCar++;
+			cntr++;
+			if (cntr>=100) {
+			 poleCar=[];
+			 pocetCar=0;
+			 cntr=0;
+			}
+			/*
+			for (n=0;n<poleCar.length;n++) {
+			 poleCar[n]();
+			}
+			*/
+			for (let cara of poleCar) {
+			cara();
+			}
+			//cara1();
+			//cary(10,10,500,60).kresli();	
+						
+			kontext.restore();
+			otoceni += (2 * Math.PI) / 360; // otočení o 1 stupeň, ale v radiánech
+		}
+		
+		
+	</script>
+</body>
+</html>
