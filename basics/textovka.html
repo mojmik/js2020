@@ -1,0 +1,190 @@
+<html>
+<head>
+</head>
+<body>	
+	<div id='pozice'>pozice</div>
+	<div id='moznosti'>moznosti</div>
+	<div id='out'>out</div>
+	<div id='inv'>inventar</div>
+	<script>
+	 'use strict';
+	 class Lokace {
+	   _popis= "nejaky popis";
+	   _moznosti="tvoje moznosti";
+	   constructor(popis,moznosti,seznamAkci,veci) {
+	    this._popis=popis;
+		this._moznosti=moznosti;
+		this._seznamAkci=seznamAkci;
+		this._veci=veci;
+	   }
+	   get popis() {
+	    return "Popis: " + this._popis;
+	   }
+	   vypis() {
+	     return "" + this.popis;
+	   }
+	   outMoznosti() {
+	     let out="";		 
+		 let ovladace=[];
+	     for (let a of this._seznamAkci) {
+		   let akce=spravceAkci.getAkce(a);
+		   let ovladac=document.createElement("BUTTON");
+		   ovladac.id=akce._popisAkce;
+		   ovladac.innerText=akce._popisAkce;
+		   //ovladac.onclick=akce.outCallBack();
+		   //ovladac.addEventListener('click',akce._callback.bind(this,akce._callbackArgument,3));
+		   ovladac.addEventListener('click',akce._callback);
+		   ovladace.push(ovladac);
+		   //out+="<button id='"+akce._popisAkce+"'>"+akce._popisAkce+"</button>";
+		 }
+		 return ovladace;
+	   }
+	   getVeci() {
+	    return this._veci;
+	   }
+	 }
+	 let mapa= {
+	   seznamLokaciRaw:[
+		["pop","moz",["dopredu","dozadu"]],
+		["pop2","moz2",["dopredu","dozadu"]],
+		["pop3","moz3",["dozadu","utok"],"vec"],
+	   ],
+	   pozice:0,
+	   seznamLokaci:[],
+	   zmenLokaci(n, popis=null, moznosti = null, seznamAkciRaw=null, veci=null) {
+	    if (popis!=null) mapa.seznamLokaci[n]._popis=popis;
+		if (moznosti!=null) mapa.seznamLokaci[n]._moznosti=popis;
+		if (seznamAkciRaw!=null) mapa.seznamLokaci[n]._seznamAkci=seznamAkciRaw;
+		if (veci!=null) mapa.seznamLokaci[n]._veci=veci;
+	   },
+	   getLokace(n) {
+	    return this.seznamLokaci[n];
+	   }
+	 }
+	 mapa.init = function() {	  	  
+	  for (let n=0;n<mapa.seznamLokaciRaw.length;n++) {
+	   mapa.seznamLokaci[n]=new Lokace(mapa.seznamLokaciRaw[n][0],mapa.seznamLokaciRaw[n][1],mapa.seznamLokaciRaw[n][2],mapa.seznamLokaciRaw[n][3]);
+	  }	  	  
+	 }
+	 mapa.init();
+	 
+	 class Ovladace {
+	  constructor() {
+	   this._pozice=document.getElementById('pozice');
+	   this._moznosti=document.getElementById('moznosti');
+	   this._out=document.getElementById('out');
+	  }	
+	  nastav(ovladace) {
+	   this._ovladace=ovladace;
+	  }
+	  vypis() {
+		this._moznosti.innerHTML="";
+	    for (let ovladac of this._ovladace) {
+		   this._moznosti.appendChild(ovladac);
+		}
+	  }
+	 }
+	 var ovladace=new Ovladace();
+	 
+	 let HracClass = function() { 
+	  this.pozice=0;	  
+	  this.stav="hraje";
+	  this.inventar=["stare obleceni"];
+	  this.posunHrace = function(smer = 1,mapaMax) {	   
+	   if (this.pozice+smer < mapaMax && this.pozice+smer >= 0) {	   	    
+	    this.pozice+=smer;		
+		this.stav="jdu";
+	   }
+	   else 
+		throw new Error("nelze, " + smer + ''  + this.pozice + ', ' + mapaMax);	   
+	  }
+	  this.utok = function() {
+	   this.stav="utocim";	   
+	   let utocneCislo=Math.random()*10;
+	   if (utocneCislo >= 5) { 
+	    this.stav+=" zabils";
+		mapa.zmenLokaci(this.pozice,null,null,["dopredu","seber"]);
+	   }	
+	   if (utocneCislo < 5) this.stav+=" zranils";
+	  }
+	  this.seber = function() {
+	   let veci=mapa.getLokace(this.pozice)._veci;
+	   if (veci!="") { 
+	    this.stav="beru "+veci;
+		this.inventar.push(veci);
+	   } 
+	   else this.stav="nic tu neni";
+	   mapa.zmenLokaci(this.pozice,null,null,null,"");
+	  }
+	  this.outInventar = function() {
+	    let out="";
+	    for (let n=0;n<this.inventar.length;n++) {
+		 if (n>0) out+=",";
+		 out+=this.inventar[n];		 
+		}
+		return out;
+	  }
+	 }
+
+	 let hrac=new HracClass();
+	 
+	 class Akce {
+	   constructor(popis,akce) {
+	     this._popisAkce=popis;
+		 this._callback=akce;		
+	   }
+	 }
+	 class SpravceAkci {
+	  _seznam=[];
+	  addAkce(name,callBack) {
+	   this._seznam.push(new Akce(name,callBack));
+	  }
+	  getAkce(nameAction) {
+	   for (let n=0;n<this._seznam.length;n++) {
+	     if (this._seznam[n]._popisAkce==nameAction) return this._seznam[n];
+	   }
+	  }
+	 }
+	 
+	 let posunHraceEvent= function(smer=1) {  
+	   hrac.posunHrace(smer, mapa.seznamLokaci.length);	   
+	   hra.vykresli();
+	 }
+	 
+	 let posunHraceEventDopredu= function() {  
+	   posunHraceEvent(1);
+	 }
+	 let posunHraceEventDozadu= function() {  
+	  posunHraceEvent(-1);
+	 }
+	 let utokHraceEvent= function() {  
+	   hrac.utok();
+	   hra.vykresli();
+	 }
+	 let seberHracEvent= function() {  
+	   hrac.seber();
+	   hra.vykresli();
+	 }
+
+	 let spravceAkci=new SpravceAkci(); 
+	 spravceAkci.addAkce('dopredu', posunHraceEventDopredu);
+	 spravceAkci.addAkce('dozadu', posunHraceEventDozadu);
+	 spravceAkci.addAkce('utok', utokHraceEvent);
+	 spravceAkci.addAkce('seber', seberHracEvent);
+	 
+	 let hra = {
+	    vykresli: function() {
+		 let popis=mapa.seznamLokaci[hrac.pozice].vypis();
+	     document.getElementById('pozice').innerText=popis;	   
+	     ovladace.nastav(mapa.seznamLokaci[hrac.pozice].outMoznosti());
+	     ovladace.vypis();
+		 document.getElementById('out').innerText=hrac.stav;	 
+		 document.getElementById('inv').innerText=hrac.outInventar();	
+		}	  
+	 }
+	 hra.vykresli();
+	
+	</script>
+</body>
+</html>
+

@@ -1,0 +1,365 @@
+<html>
+<head>
+ <style>
+$color: #0cf;
+.neco {
+}
+	  
+.mbutton {
+display: inline-block;
+        background-color: #7b38d8;
+        border-radius: 10px;
+        border: 4px double #cccccc;
+        color: #eeeeee;
+        text-align: center;
+        font-size: 28px;
+        padding: 20px;
+        width: 200px;
+        -webkit-transition: all 0.5s;
+        -moz-transition: all 0.5s;
+        -o-transition: all 0.5s;
+        transition: all 0.5s;
+        cursor: pointer;
+        margin: 5px;
+    
+}
+div {
+ background:#fff;
+ text-align:center;
+ padding:10px;
+  color: var(--text);
+  text-shadow: 1px 1px 1px #000, 
+               3px 3px 5px blue; 
+}
+body {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+	background-image:url('dlazdice.jpg');
+}
+ </style>
+</head>
+<body> 
+ <div id="wrap">
+	 <div style="display:none;" id="cast">1</div>
+	 <div id="popis" style='font-size:24px;'></div>
+	 <div id="inventar" style='font-size:24px;'></div>
+	 <br/><br/><br/>
+	 <div style='font-size:24px;' id="hraPlocha"></div>
+	 <div id="tlacitka">
+		 <button class="mbutton" id="tlacitko1">tlacitko</button>
+		 <button class="mbutton" id="tlacitko2">tlacitko2</button>
+		 <button class="mbutton" id="tlacitko3">tlacitko3</button>
+	 </div>	
+	 <div> 
+	  <input class="mbutton" id="zadanyText"></input>
+	 </div> 
+	 <div id="obrazky"></div>
+ </div>
+ <script>    
+
+  
+   function vypis(co) {
+    let hraPlocha=document.getElementById("hraPlocha");
+	hraPlocha.innerHTML=co;
+   }
+   function jakaCast() {
+    let cast=document.getElementById("cast");
+	return parseInt(cast.innerText);	
+   }
+   function nastavCast(cast) {
+    let castEl=document.getElementById("cast");
+	castEl.innerText = cast;
+	hrajDal();
+   }
+   function nastavPopis(text) {
+	let popis=document.getElementById("popis");
+	popis.innerHTML=text;
+   }
+   function nahodnyCislo(cisloOd,cisloDo) {
+    let min = Math.ceil(cisloOd);
+    let max = Math.floor(cisloDo);
+    return Math.floor(Math.random() * (max - min + 1)) + min;	   
+   }
+   function zamichejTlacitka() {
+    var ul = document.getElementById("tlacitka");
+	for (var i = ul.children.length; i >= 0; i--) {
+		ul.appendChild(ul.children[Math.random() * i | 0]);
+	}
+   }
+   function schovejTlacitka() {
+    var div = document.getElementsByClassName("mbutton");	
+	for (var i = 0; i < div.length; i++) {		
+		div[i].style.display="none";
+	}
+   }
+   function schovejObrazky() {
+   	 let obrazkyPlocha=document.getElementById("obrazky");
+	 obrazkyPlocha.innerHTML="";
+   }
+   let hrac = {
+    zlato:0,
+	cas:new Date(),
+	get casElapsed() {
+	  //return "uplynuly cas: " + (Date()-this.cas);	  
+	  return "uplynuly cas: " + Math.floor((new Date()-this.cas)/1000) + "s";
+	},
+	vypisSkore: function() {
+	  document.getElementById("inventar").innerText="Zlatych minci ziskano: " + this.zlato + " "+this.casElapsed;
+	}
+   }
+    
+   
+   class Obrazek {   
+	   obrazekInterval=null;
+	   obrazekElement=null;
+	   constructor(name,src,width=100,height=100) {
+	     const img=new Image(src);
+		 let obrazkyPlocha=document.getElementById("obrazky");
+	     this.obrazekElement=document.createElement("img");
+		 this.obrazekElement.id=name;
+		 this.obrazekElement.src=src;	
+		 this.obrazekElement.width=width;
+		 this.obrazekElement.height=height;
+		 this.obrazekElement.ondragstart = function() { return false; };
+		 console.log(this.obrazekElement.src);
+		 obrazkyPlocha.appendChild(this.obrazekElement);
+	   }
+	   schovej() {		
+		this.obrazekElement.style.display="none";
+	   }
+	   ukaz() {				
+		this.obrazekElement.style.display="inline";
+	   }	   
+	   utikej() {
+		this.obrazekInterval=setInterval(this.kam,500);
+	   } 
+	   kam= (x=0,y=0,nahodnyRozptylMin=0,nahodnyRozptylMax=400) => {		
+		this.obrazekElement.style.position="absolute";
+		if (nahodnyRozptylMax>0) {
+		 this.obrazekElement.style.top=nahodnyCislo(nahodnyRozptylMin,nahodnyRozptylMax)+"px";
+		 this.obrazekElement.style.left=nahodnyCislo(nahodnyRozptylMin,nahodnyRozptylMax)+"px";
+		} 
+		else {
+		 this.obrazekElement.style.top=x+"px";
+		 this.obrazekElement.style.left=y+"px";
+		}
+	   }
+	   nastavKlik(uspech) {		
+		this.obrazekElement.onclick=uspech;
+		clearInterval(this.obrazekInterval);
+	   }
+   }
+   
+   
+   function nastavTlacitko(name,text) {
+    var t = document.getElementById(name);	
+	if (text!="") t.style.display="inline";	
+	t.innerText=text;
+   }
+   
+   function zadejText() {
+    var t = document.getElementById("zadanyText");	
+	t.style.display="inline";
+	t.focus();
+   }
+   function ziskejZadanyText() {
+    var t = document.getElementById("zadanyText");	
+	return t.value;
+   }
+   function nastavZadanyText() {
+	var t = document.getElementById("zadanyText");	
+	t.value="";
+   }
+   
+   function hrajDal() {
+    let tlac1=document.getElementById("tlacitko1");
+    let tlac2=document.getElementById("tlacitko2");
+    let tlac3=document.getElementById("tlacitko3");   
+    let popis=document.getElementById("popis");
+	vypis("");	
+	hrac.vypisSkore();
+	schovejTlacitka();
+	schovejObrazky();
+	tlacitko1=function() {}
+	tlacitko2=function() {}
+	tlacitko3=function() {}
+	if (typeof obrazekInterval !== 'undefined') clearInterval(obrazekInterval);
+	
+	
+	//1. level
+	if (jakaCast()==1) {	 
+	 nastavPopis("Jsi na rozcesti. Bud zahni ke zlatu nebo k pavoukovi.");
+	 nastavTlacitko("tlacitko1","k pavoukovi");
+	 nastavTlacitko("tlacitko2","ke zlatu");	 
+	 tlacitko1=function() {
+	  nastavCast(20); //pavouk	  
+	 }
+	 tlacitko2=function() {
+	  nastavCast(21); //zlato	  
+	 }
+	 
+	}
+	
+	//pavouk
+	if (jakaCast()==20) {	 
+	 nastavPopis("Pavouk spadl do lavy a ty muzes jit dal.");
+	 nastavTlacitko("tlacitko1","jit dal");
+	 obrazek=new Obrazek("pikachu","pavouk.jpg",400,200);	
+	 otaceni=1;
+	 posun=1;
+	 function otacej() {
+  	  if (otaceni>400) posun=-1;
+	  if (otaceni<1) posun=1;	  
+	  otaceni+=posun;
+	  obrazek.obrazekElement.style.transform = "rotate("+otaceni+"deg)";
+	  obrazek.obrazekElement.style.left=otaceni;
+	  obrazek.obrazekElement.style.position="absolute";
+	  
+	 }
+	 obrazekInterval=setInterval(otacej,5);	 
+	 obrazek.ukaz();
+	 tlacitko1=function() {
+	  nastavCast(6); //blb	  
+	 }
+	
+	}
+	
+	//zlato
+	if (jakaCast()==21) {	 
+	 nastavPopis("Spadl jsi do diry a na zlato muzes leda snit v nebi.");
+	 nastavTlacitko("tlacitko1","snit");
+	 nastavTlacitko("tlacitko2","hrat znova");
+	 obrazek=new Obrazek("pikachu","dira.jpg",600,800);
+	 obrazek.ukaz();
+	 
+	 tlacitko1=function() {
+	  vypis("zda se ti, ze jsi v dire");
+	 }
+	 tlacitko2=function() {	
+	  nastavCast(1); //zacatek	  
+	 }
+	 
+	}
+	
+	if (jakaCast()==6) {	 
+	 let cislo1=nahodnyCislo(5,100);
+	 let cislo2=nahodnyCislo(6,120);
+	 let soucet=cislo1+cislo2;
+	 nastavPopis("Jsi hloupej blb v temne mistnosti, kolik je "+cislo1+"+"+cislo2);
+	 nastavTlacitko("tlacitko1",soucet-1);
+	 nastavTlacitko("tlacitko2",soucet+1);
+	 nastavTlacitko("tlacitko3",soucet);
+	 zamichejTlacitka();
+	 tlacitko1=function() {
+	  vypis("spatne");
+	 }
+	 tlacitko2=function() {
+	  vypis("spatne");
+	 }
+	 tlacitko3=function() {
+	  vypis("spravne");		 
+	  nastavCast(2);		  
+	 }
+	}
+	
+	//2. level
+	if (jakaCast()==2) {	 
+	 let cislo1=nahodnyCislo(1,10);
+	 let cislo2=nahodnyCislo(1,10);
+	 nastavPopis("Jsi v dalsi mistnosti, kolik je " + cislo1 + " *" + cislo2);
+	 nastavTlacitko("tlacitko1",cislo1);
+	 nastavTlacitko("tlacitko2",cislo1*cislo2);
+	 nastavTlacitko("tlacitko3",cislo1*cislo2+10);
+	 zamichejTlacitka();
+	 tlacitko1=function() {
+	  vypis("spatne");
+	 }
+	 tlacitko2=function() {
+	  vypis("spravne");
+	  nastavCast(3);	  
+	 }
+	 tlacitko3=function() {
+	  vypis("spatne");		 
+	 }
+	}	
+	
+	//3. level
+	if (jakaCast()==3) {
+	 nastavPopis("Rozlusti slovo morst");	 	
+	 nastavTlacitko("tlacitko3","lusti");
+	 nastavZadanyText();	
+	 tlacitko3=function() {	 		
+		 zadejText();
+		 nastavTlacitko("tlacitko3","napis odpoved a klikni");
+		 zadanyT=ziskejZadanyText();
+		 if (zadanyT != "") {			 
+			 if (zadanyT=="strom" || zadanyT=="hacker") {
+			  nastavCast(4);			  
+			 }
+			 else {
+			  vypis("umrels");
+			 }
+		 }		 
+	 } 	 
+	}
+	
+	//4. level
+	if (jakaCast()==4) {
+	 nastavPopis("chytni pokemona (klikni na pikachu mysi)");	 		 	 		
+	 let uspech=function() {
+      nastavCast(10);	  
+	 }
+	 obrazek=new Obrazek("pikachu","pikachu.png");
+	 obrazek.ukaz();
+	 obrazek.nastavKlik(uspech);
+	 obrazek.utikej();	  
+	}
+	
+	//10. level (konec)
+	if (jakaCast()==10) {	
+	 nastavPopis("Jsi v cili!");
+	 
+	 tlacitko1=function() {
+	  nastavCast(1);	  
+	 }
+	 tlacitko2=function() {
+	  vypis("jo,jo");	  
+	 }
+	 tlacitko3=function() {
+	  vypis("jo!");		 	  
+	 }
+	 let zlato=[];
+	 let uspech=function() {
+      hrac.zlato++;
+	  hrac.vypisSkore();
+	  this.style.display="none";
+	 }
+	 for (let n=0;n<50;n++) {
+	  zlato[n]=new Obrazek("zlato"+n,"zlato.png");
+	  zlato[n].kam(0,0,480,550);
+	  zlato[n].nastavKlik(uspech);
+	 }
+	 setTimeout(function(){ 
+		alert("Cas vyprsel"); 
+		for (let n=0;n<50;n++) {		  
+		  zlato[n].schovej();		  
+		 }
+		 nastavTlacitko("tlacitko1","znova");
+		 nastavTlacitko("tlacitko2","super");
+		 nastavTlacitko("tlacitko3","pecka");
+	 }, 5000);
+	}
+	
+	tlac1.onclick=tlacitko1;	
+	tlac2.onclick=tlacitko2;
+	tlac3.onclick=tlacitko3;	
+   }
+   hrajDal();
+
+ </script>
+</body>
+</html>

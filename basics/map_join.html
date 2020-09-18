@@ -1,0 +1,23 @@
+<html>
+<head>
+</head>
+<body>
+	<script>
+	 'use strict';
+	
+		const nakup = ['Rohlíky', 'Máslo', 'Rýže'];
+
+		const htmlSeznam = '<ul>' + nakup.map(hodnota => '<li>' + hodnota + '</li>').join('\n') + '</ul>';
+
+		document.write(htmlSeznam);	
+		
+		const cisla = [1, 2, 3, 4, 5];
+
+		const soucet = cisla.reduce((soucet, prvek) => soucet + prvek, 0);
+	
+		document.write(`Součet: ${soucet}`);
+	
+	</script>
+</body>
+</html>
+

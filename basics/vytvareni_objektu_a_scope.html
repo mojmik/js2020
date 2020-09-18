@@ -1,0 +1,50 @@
+<html>
+<head>
+</head>
+<body>
+ okno
+	<script>
+	 'use strict';
+		let a=function() {		 
+		 let vlastnost="ahoj";
+		 let b=function() {
+		  document.write(vlastnost);
+		 }
+		 b();
+		}
+		a();
+		//vypise ahoj, v b je videt promena z a
+		
+		
+		let a2=function() {
+		 this.neco="cau";	
+		}		
+		//a2();   //tohle je error, protoze a2 neni objekt, nejde tam pouzit this.neco="cau"
+				
+		let c2=new a2(); // c2 bude objekt, takze this.neco uz bude fungovat
+		document.write(c2.neco);
+		
+		let a3= {
+		 neco: "cau3",
+		 b3: function() {
+		   document.write("b3 " + this.neco);
+		 }
+		}
+		document.write(a3.neco);
+		a3.b3();
+		
+		
+		/*
+		let c={ 
+		 vlastnost:"ahoj"
+		}
+		document.write(c.vlastnost);
+		
+		let d=new a();
+		document.write(d.vlastnost);
+		*/
+	
+	</script>
+</body>
+</html>
+
